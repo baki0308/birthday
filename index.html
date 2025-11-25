@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>С Днём Рождения, Мама!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@300;500;700&display=swap');
+
+  :root{
+    --bg1: #ff9a9e;
+    --bg2: #fad0c4;
+    --card-bg: rgba(255,255,255,0.15);
+    --glass-blur: 10px;
+  }
+
+  html,body{height:100%;}
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* ФОН */
+  canvas#bg{
+    position: fixed; inset:0; width:100vw; height:100vh; z-index:-1; 
+    background: radial-gradient(circle at center, var(--bg1), var(--bg2), #fcb69f);
+  }
+
+  .content{
+    position: relative; z-index:2; text-align:center; padding:6vh 6vw; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; box-sizing:border-box;
+  }
+
+  h1{
+    font-family: 'Pacifico', cursive; font-size:7.5vmin; margin:0; line-height:1; animation:glow 3s infinite; text-shadow:0 0 12px rgba(255,255,255,0.6);
+  }
+  @keyframes glow{0%{text-shadow:0 0 6px rgba(255,255,255,0.3);}50%{text-shadow:0 0 30px rgba(255,230,242,0.9);}100%{text-shadow:0 0 6px rgba(255,255,255,0.3);}}
+
+  .card{
+    margin-top:4vmin; background:var(--card-bg); padding:4vmin; border-radius:18px; backdrop-filter:blur(var(--glass-blur)); max-width:900px; width:100%; box-sizing:border-box; font-size:3.2vmin; line-height:1.5; animation:float 5s ease-in-out infinite;
+  }
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+  .heart{font-size:10vmin; animation:pulse 1.2s infinite; margin-bottom:2vmin}
+  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+  /* Плавающая кнопка-подарок */
+  .gift-btn{position:fixed; right:18px; bottom:18px; z-index:4; background:linear-gradient(180deg,#ff7aa2,#ff4d6d); border:none; width:64px; height:64px; border-radius:50%; box-shadow:0 8px 20px rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer;}
+  .gift-btn:active{transform:scale(0.95)}
+
+  /* Мобильные улучшения */
+  @media (max-width:600px){
+    .card{padding:5vmin; font-size:4.2vmin}
+    h1{font-size:12vmin}
+    .heart{font-size:16vmin}
+    .gift-btn{width:56px;height:56px;font-size:24px;right:12px;bottom:12px}
+  }
+
+  /* Невидимая подсказка для того, чтобы пользователь знал про подарок */
+  .hint{position:fixed; left:18px; bottom:22px; z-index:4; font-size:12px; opacity:0.9}
+  @media (max-width:600px){.hint{left:12px;bottom:16px;font-size:11px}}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="content">
+  <div class="heart">❤</div>
+  <h1>С Днём Рождения, Мама!</h1>
+  <div class="card" id="message">
+    Дорогая мама! <br><br>
+    Спасибо тебе за твою бесконечную доброту, тепло и любовь. Ты делаешь этот мир ярче, а жизнь — счастливее.
+    Пусть этот день подарит тебе море радости, улыбок и вдохновения. Пусть сбудется всё, что ты желаешь.
+    <br><br>
+    Я тебя очень люблю! ❤️
+  </div>
+</div>
+
+<button class="gift-btn" id="gift">🎁</button>
+<div class="hint">Нажми на подарок — особенный сюрприз!</div>
+
+<script>
+// --- НАСТРОЙКИ ПАРТИКЛОВ (адаптивно для мобил) ---
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resize(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function createParticles(count){
+  particles = [];
+  for(let i=0;i<count;i++){
+    particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+0.8,dx:(Math.random()-0.5)*0.6,dy:(Math.random()-0.5)*0.6,alpha:Math.random()*0.9});
+  }
+}
+
+// меньше частиц на телефоне
+const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 700;
+createParticles(isMobile?60:140);
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+    ctx.fill();
+    p.x += p.dx; p.y += p.dy;
+    if(p.x<0||p.x>canvas.width) p.dx*=-1; if(p.y<0||p.y>canvas.height) p.dy*=-1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// --- КОНФЕТТИ / СЮРПРИЗ ПРИ НАЖАТИИ НА КНОПКУ ---
+const gift = document.getElementById('gift');
+let confettiRunning = false;
+
+function makeConfetti(x,y){
+  const colors = ['#ff6b6b','#ffd166','#6bf2c1','#9b8cff','#ff9a9e'];
+  const pieces = [];
+  for(let i=0;i<40;i++){
+    pieces.push({x,y,vx:(Math.random()-0.5)*6,vy:(Math.random()-1)*8, size: Math.random()*6+4, color: colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, vr: (Math.random()-0.5)*10});
+  }
+
+  let t = 0;
+  function step(){
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    pieces.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.rot += p.vr;
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+      ctx.rotate(-p.rot*Math.PI/180); ctx.translate(-p.x,-p.y);
+    });
+    ctx.restore();
+    t++;
+    if(t<120) requestAnimationFrame(step);
+  }
+  step();
+}
+
+gift.addEventListener('click', ()=>{
+  if(confettiRunning) return; confettiRunning = true;
+  // позиция — около кнопки
+  const rect = gift.getBoundingClientRect();
+  const x = rect.left + rect.width/2; const y = rect.top + rect.height/2;
+  makeConfetti(x,y);
+  // небольшая текстовая анимация
+  const card = document.getElementById('message');
+  const old = card.innerHTML;
+  card.innerHTML = '<strong>Сюрприз!</strong><br><br>Пусть каждый день будет наполнен радостью и теплом. С любовью — твой(я) ребёнок.';
+  setTimeout(()=>{ card.innerHTML = old; confettiRunning=false; }, 4200);
+});
+
+// --- ТАЧ-СОБЫТИЯ ДЛЯ МОБИЛЬНЫХ: коснись экрана — маленький фейерверк ---
+function touchBurst(x,y){
+  const ctxSaved = ctx.getImageData(0,0,1,1); // dummy to keep ctx usable
+  makeConfetti(x,y);
+}
+
+let lastTap = 0;
+window.addEventListener('touchstart', (e)=>{
+  const touch = e.touches[0];
+  touchBurst(touch.clientX, touch.clientY);
+  const now = Date.now();
+  if(now - lastTap < 350){ // double tap -> open big surprise
+    gift.click();
+  }
+  lastTap = now;
+});
+
+// --- Плавное скролл-центрирование при маленьком экране ---
+if(isMobile){
+  setTimeout(()=>{ window.scrollTo({top:0, behavior:'smooth'}); }, 300);
+}
+
+</script>
+
+</body>
+</html>
